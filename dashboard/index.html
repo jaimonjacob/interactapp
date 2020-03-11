@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Interact dashboard test</title>
+
+<script type="text/javascript" src="js/jquery-1.12.3.js" ></script>
+<script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="js/dataTables.bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css" href="CSS/bootstrap.min.css"></link>
+<link rel="stylesheet" type="text/css" href="CSS/dataTables.bootstrap.min.css"></link>
+<link rel="stylesheet" type="text/css" href="CSS/style.css"></link>
+<meta http-equiv="refresh" content="10" >
+
+</head>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+	<div class="container">
+		<a class="navbar-brand" href="#">
+			<img src="img/lococomp.png" height="50px" alt="">
+		</a>
+		<a class="navbar-brand" href="#">
+			<img src="img/applogo.png" height="50px" alt="">
+		</a>
+	 </div>
+  </nav>
+
+<body>	
+<section class="jumbotron text-center">
+<div class="container">
+<script src="tincan.js" type="text/javascript"></script>
+<script>
+var MultiArray = [];
+   var Pdata = [];
+   var profile = [];
+   var mailid;
+   var ids =1;
+   var ids2 = 2;
+   var attempt=0;
+$(document).ready( function () {
+
+    
+	 report();
+
+
+ });
+ function report(){ 
+   var tincan = new  TinCan({
+		recordStores: [{
+		endpoint: 'https://watershedlrs.com/api/organizations/10981/lrs/',
+		username: 'bde27ce0f7b36e',
+		password: '2bb3f290d84811',
+		allowFail:false
+		}]
+	});
+  var MultiArray = []
+	var container =  document.getElementById('response');
+
+	tincan.getStatements({
+
+	  'params' : {
+		'verb' : {
+			'id' : 'http://user/intraction/assigned'
+		 }
+	  }, // <-- don't forget this comma, seriously, it will drive you nuts.
+	  'callback': function (err, result) {
+
+		  container.innerHTML  = (err !== null ? 'ERROR' : parseMyData(result));
+	   }
+	}); 
+	
+	parseMyData = function(result) {
+		var statements = result.statements;
+		var name,mail,verb,activity,enus,description,time,count=0;
+		
+		for(var i=0;i< statements.length;i++){
+			// check the statement for a usable name value
+			// (priority = actor.name, actor.mbox, actor.account.name)
+			if(statements[i].actor.name != null && statements[i].actor.name != "") {
+				name = statements[i].actor.name;mail = statements[i].actor.mbox;
+			}else if(statements[i].actor.mbox != null && statements[i].actor.mbox != "") {
+				mail = statements[i].actor.mbox
+			}else{
+				mail = statements[i].actor.mbox
+			}
+			// check the statement for a usable verb value
+			// (priority = verb.display['en-US'], verb.id)
+			try{
+				verb = statements[i].verb.display['und'];
+				//verb = statements[i].verb.id;
+			}catch(e){
+				verb = statements[i].verb.id;
+			}
+			// check the activity for a usable value
+			// (priority = definition.name['en-US'], id)
+			try{
+				//activity = statements[i].target.definition.name['enUS'];
+				activity = statements[i].target.id;
+			}catch(e){
+				activity = statements[i].target.id;
+			}
+			try{
+				enus = statements[i].target.definition.name['enUS'];
+			}catch(e){
+				enus = statements[i].target.id;
+			}
+			try{
+				description = statements[i].target.definition.description['enUS'];
+			}catch(e){
+				description = statements[i].target.id;
+			}
+			try{
+				time = statements[i].timestamp;
+			}catch(e){
+				time = statements[i].timestamp;
+			}
+			if( activity == "http://6ZtBDOyAF8U_course_id")
+			{ 
+							
+					MultiArray[count] = new Array(3);
+					MultiArray [count]['SName'] = name; 
+					
+					MultiArray [count]['Assigned'] = verb;
+					MultiArray [count]['Activity'] = enus;
+					
+					count++;
+					
+				
+			}                  
+		}
+		
+    var table = document.getElementById("example"+ids);
+	
+    for(i=0;i< MultiArray.length;i++)
+    {
+		var row = table.insertRow(i+1);
+		var cell1 = row.insertCell(0);
+		var cell2 = row.insertCell(1);
+		var cell3 = row.insertCell(2);
+		
+		cell1.innerHTML = MultiArray[i].SName;
+		cell2.innerHTML = MultiArray[i].Assigned;
+		cell3.innerHTML = MultiArray[i].Activity;
+		
+    }
+     table.deleteRow(MultiArray.length+1)
+	 
+	
+    if(attempt<2){
+	attempt++;
+    $('#example'+ids).dataTable( {
+	"bSort": false,
+	"pageLength" : 100, 
+    "ordering": false
+    });  }
+ }
+}
+ 
+   
+</script>
+
+<style type="text/css">
+#tab_wrapper1{
+    width: 97%;
+    margin: auto;
+    margin-top: 2%;
+}
+#tab_wrapper2{
+    width: 97%;
+    margin: auto;
+    margin-top: 2%;
+}
+#others-details{
+    width: 97%;
+    margin: auto;
+    margin-top: 2%;
+}
+#tab_wrapper3{
+    width: 97%;
+    margin: auto;
+    margin-top: 2%;
+}
+.table-striped>tbody>tr:nth-of-type(odd) {
+    background-color: #ffffff !important ;
+   
+}
+.table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th {
+    border: 1px solid #D3D3D3; 
+    border-top-color:000;
+    border-right-color:#ffffff;
+}
+thead{
+	background-color: #eff4f5;
+	}
+#tab_wrapper{
+
+	height: 50px;
+    margin: auto;
+	width:90%;
+    margin-top: 2%;
+	background-color: #0091DA;
+}
+
+/* hr.style18 { 
+  height: 30px; 
+  border-style: solid; 
+  border-color: #0a7186; 
+  border-width: 1px 0 0 0; 
+  border-radius: 20px; 
+  margin-left: 20px;
+  margin-right: 20px;
+}  */
+
+/* hr.style1{
+	border-top: 3px double #0a7186;
+	margin-left: 20px;
+    margin-right: 20px;
+	
+} */
+
+th {
+	text-align: center;
+}
+
+</style>
+
+<h2 style="color: gray;">The Value Wheel</h2>
+<div id="tab_wrapper" align="center"><h3 style="padding-top: 12px;color: #fff;">Dashboard</h3> </div>
+<hr class="style18">
+
+
+<div id="tab_wrapper1">
+<table id="example1" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Learner</th>
+                <th>Activity</th>
+                <th>Task</th>
+                
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<hr class="style1">
+</div>
+</section>
+</body>
+</html>

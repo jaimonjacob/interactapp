@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Interact app test</title>
+
+ 	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+	<script type="text/javascript" src="Js/Winwheel.js"></script>
+	<script type="text/javascript" src="Js/custom.js"></script>
+	<script type="text/javascript" src="Js/tincan-min.js"></script>
+     <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+	<style>
+		
+	</style>
+
+</head>
+<body>
+	
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+		<div class="container">
+			<a class="navbar-brand" href="#">
+				<img src="img/lococomp.png" height="50px" alt="">
+			</a>
+			<a class="navbar-brand" href="#">
+				<img src="img/applogo.png" height="50px" alt="">
+			</a>
+		 </div>
+	  </nav>
+	
+	
+	<section class="jumbotron text-center">
+		<h2 style="color: gray;">The Value Wheel</h2>
+		<div class="container">
+			<div class="row content">
+				
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center" id="placeholder"> 
+				<div align="center">
+					<p id="txt">Click the wheel to spin it!</p>
+					 <table>
+						<tr>
+							<td width="338" height="390" class="the_wheel" align="center" valign="center">
+								<div id="canvasContainer ">
+								<canvas id="canvas" width="434" height="434" onClick="startSpin();">
+									<p style="{color: white}" align="center">Sorry, your browser doesn't support canvas. Please try another.</p>
+								</canvas>
+								 <img id="prizePointer" src="img/pointer.png" alt="V" />
+									</div>
+							</td>
+						</tr>
+					</table>
+			
+        		</div>
+			</div>
+			<div id="myModal" class="modal " >
+				  <div class="modal-content">
+					  <p id="popup-content"> </p>
+				  </div>
+			</div>	
+		</div>
+		</div>
+	</section>
+<!-- Footer -->
+<footer class="page-footer font-small blue">
+
+<!-- Copyright 
+<div class="footer-copyright text-center py-3">© 2020 Copyright:
+	<a href="https://home.kpmg/xx/en/home.html"> KPMG</a>
+</div>
+ Copyright -->
+
+</footer>
+<!-- Footer -->
+
+<script type="text/javascript">
+		  
+   var url = window.location.href.split('?=');
+   var urlData = url[1];
+   var printVars = urlData.split(',');
+   var eid = printVars[0];
+   var name = unescape(printVars[1]);
+   name = name.replace("%20"," ");	
+
+   var myVar;
+		  
+	/*********************Spinner start ***********************/ 
+    // Create new wheel object specifying the parameters at creation time.
+	let theWheel = new Winwheel({
+		'numSegments'   : 5,   // Specify number of segments.
+		'outerRadius'   : 212,  // Set radius to so wheel fits the background.
+		 'lineWidth'   : 8,
+		'strokeStyle' : '#ffffff',
+		'textFontSize'  : 16,   // Set font size accordingly.
+		'textFillStyle'  : '#FFFFFF',
+		'textOrientation' : 'curved',
+		'textAligment' : 'outer',
+		'textMargin'    : 55,    // Take out default margin.
+		'segments'      :       // Define segments including colour and text.
+		[
+		   {'fillStyle' : '#6C1E75', 'textFontFamily' : 'Arial',   'textFontSize' : 20, 'text' : 'Excellence'},
+		   {'fillStyle' : '#00489A', 'textFontFamily' : 'Arial',   'textFontSize' : 20, 'text' : 'Courage'},
+		   {'fillStyle' : '#292B65', 'textFontFamily' : 'Arial',   'textFontSize' : 20, 'text' : 'Together'},
+		   {'fillStyle' : '#0168C6', 'textFontFamily' : 'Arial',   'textFontSize' : 20, 'text' : 'For Better'},
+		   {'fillStyle' : '#046B72', 'textFontFamily' : 'Arial',   'textFontSize' : 20, 'text' : 'Integrity'}
+
+		],
+		'animation' :           // Define spin to stop animation.
+		{
+			'type'     : 'spinToStop',
+			'duration' : 5,
+			'spins'    : 8,
+			'callbackFinished' : alertPrize
+		}
+	});
+	
+	// Vars used by the code in this page to do power controls.
+	let wheelPower    = 0;
+	let wheelSpinning = false;
+
+	// -------------------------------------------------------
+	// Function to handle the onClick on the power buttons.
+	// -------------------------------------------------------
+
+
+	// -------------------------------------------------------
+	// Click handler for spin button.
+	// -------------------------------------------------------
+	// Called by the onClick of the canvas, starts the spinning.
+	function startSpin()
+	{
+		// Stop any current animation.
+		theWheel.stopAnimation(false);
+
+		// Reset the rotation angle to less than or equal to 360 so spinning again
+		// works as expected. Setting to modulus (%) 360 keeps the current position.
+		theWheel.rotationAngle = theWheel.rotationAngle % 360;
+
+		// Start animation.
+		theWheel.startAnimation();
+
+		clearTimeout(myVar);
+	}
+
+	// -------------------------------------------------------
+	// Function for reset button.
+	// -------------------------------------------------------
+	function resetWheel()
+	{
+		theWheel.stopAnimation(false);  // Stop the animation, false as param so does not call callback function.
+		theWheel.rotationAngle = 0;     // Re-set the wheel angle to 0 degrees.
+		theWheel.draw();                // Call draw to render changes to the wheel.
+		wheelSpinning = false;          // Reset to false to power buttons and spin can be clicked again.
+	}
+
+	// -------------------------------------------------------
+	// Called when the spin animation has finished by the callback feature of the wheel because I specified callback in the parameters.
+	// note the indicated segment is passed in as a parmeter as 99% of the time you will want to know this to inform the user of their prize.
+	// -------------------------------------------------------
+	function alertPrize(indicatedSegment)
+	{
+		// Do basic alert of the segment text. You would probably want to do something more interesting with this information.
+
+        // XAPI datas
+		var vid= "http://user/intraction/assigned";
+		var und = "is assigned";
+		var enUS = indicatedSegment.text;
+		var Content ="Course Assignment";
+		send(eid,name,vid,und,enUS,Content);
+		
+		// Modal display
+		var modal = document.getElementById("myModal");
+		document.getElementById("popup-content").innerHTML = "Congrats! You are assigned"+' "'+indicatedSegment.text+'".'+ " Pick the card titled "+ ' "'+indicatedSegment.text+'"' + " in the next page." ;
+		modal.style.display = "block";
+		var content =("card_index.html?="+ eid+","+indicatedSegment.text);
+		myVar = setTimeout(function(){ window.open(content,"_self");; }, 6000);
+
+	}
+
+ /*********************Spinner End ***********************/  
+   
+   </script>
+
+</body>
+
+</html>
